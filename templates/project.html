@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} | Daniel Dev{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('index') }}">← Back to projects</a></p>
+
+<section class="panel detail-layout">
+    <div class="detail-art">
+        {% if project.image %}
+        <img src="{{ project.image }}" alt="{{ project.title }}" referrerpolicy="no-referrer">
+        {% else %}
+        <div class="placeholder large">
+            <span>&lt;/&gt;</span>
+            <strong>{{ project.category }}</strong>
+            <small>PROJECT PREVIEW</small>
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <span class="badge">{{ project.category }}</span>
+        <h1>{{ project.title }}</h1>
+        <p class="description">{{ project.description }}</p>
+        <p class="price">{{ project.price|kes }}</p>
+        <p>Starting development estimate</p>
+        <p class="delivery">Estimated delivery: {{ project.days }} days</p>
+
+        <form method="post" action="{{ url_for('add_to_cart', project_id=project.id) }}">
+            {{ csrf() }}
+            <button type="submit">I want a project like this</button>
+        </form>
+
+        {% if project.demo %}
+        <p>
+            <a class="button secondary" href="{{ project.demo }}" target="_blank" rel="noopener noreferrer">Open live
+                demo ↗</a>
+        </p>
+        {% endif %}
+
+        <p class="muted">
+            Final scope, price and start date are agreed before development.
+            Hosting, domain registration, maintenance and third-party fees
+            are separate unless explicitly included in your quotation.
+        </p>
+    </div>
+</section>
+{% endblock %}

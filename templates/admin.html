@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="section-heading">
+    <div>
+        <h1>Daniel’s dashboard</h1>
+        <p class="muted">Manage project packages, prices, timelines and enquiries.</p>
+    </div>
+    <form method="post" action="{{ url_for('logout') }}">
+        {{ csrf() }}
+        <button class="secondary" type="submit">Log out</button>
+    </form>
+</div>
+
+<section class="panel">
+    <h2>{{ 'Edit project' if editing else 'Add a project' }}</h2>
+
+    <form method="post" action="{{ url_for('save_project') }}" class="admin-form">
+        {{ csrf() }}
+        <input type="hidden" name="project_id" value="{{ editing.id if editing else 0 }}">
+
+        <label>Project title
+            <input name="title" required maxlength="120" value="{{ editing.title if editing else '' }}">
+        </label>
+
+        <label>Category
+            <select name="category" required>
+                {% for category in categories %}
+                <option value="{{ category }}" {{ 'selected' if editing and editing.category==category else '' }}>
+                    {{ category }}
+                </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>Starting price in KSh
+            <input name="price" type="number" min="0" max="100000000" step="1" required
+                value="{{ editing.price if editing else '' }}">
+        </label>
+
+        <label>Estimated delivery in days
+            <input name="days" type="number" min="1" max="3650" step="1" required
+                value="{{ editing.days if editing else '' }}">
+        </label>
+
+        <label>Screenshot URL — optional, HTTPS only
+            <input name="image" type="url" maxlength="1000" placeholder="https://your-image-host.com/project.jpg"
+                value="{{ editing.image if editing else '' }}">
+        </label>
+
+        <label>Live demo URL — optional, HTTPS only
+            <input name="demo" type="url" maxlength="1000" placeholder="https://your-project.com"
+                value="{{ editing.demo if editing else '' }}">
+        </label>
+
+        <label class="wide">Description and included features
+            <textarea name="description" rows="5" required minlength="10"
+                maxlength="5000">{{ editing.description if editing else '' }}</textarea>
+        </label>
+
+        <div class="wide actions">
+            <button type="submit">Save project</button>
+            {% if editing %}
+            <a class="button secondary" href="{{ url_for('admin') }}">Cancel editing</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Your projects</h2>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Starting price</th>
+                    <th>Delivery</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ project.title }}</td>
+                    <td>{{ project.price|kes }}</td>
+                    <td>{{ project.days }} days</td>
+                    <td>
+                        <div class="actions">
+                            <a class="button secondary" href="{{ url_for('admin', edit=project.id) }}">Edit</a>
+
+                            <form method="post" action="{{ url_for('delete_project', project_id=project.id) }}">
+                                {{ csrf() }}
+                                <button class="danger" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No projects yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section>
+    <h2>Client enquiries</h2>
+    <p class="muted">
+        Keep client information private. Delete old records according to your
+        retention policy and protect database backups.
+    </p>
+
+    {% for enquiry in enquiries %}
+    <article class="panel enquiry">
+        <div class="section-heading">
+            <div>
+                <h3>{{ enquiry.reference }} · {{ enquiry.name }}</h3>
+                <p class="muted">{{ enquiry.created_at }} UTC</p>
+            </div>
+            <span class="badge">{{ enquiry.status }}</span>
+        </div>
+
+        <p><strong>Email:</strong> {{ enquiry.email }}</p>
+        <p><strong>Phone:</strong> {{ enquiry.phone }}</p>
+
+        <div class="message">{{ enquiry.message }}</div>
+
+        <h4>Selected examples</h4>
+        <ul>
+            {% for project in enquiry.projects %}
+            <li>
+                {{ project.title }} — {{ project.price|kes }} —
+                {{ project.days }} days
+            </li>
+            {% endfor %}
+        </ul>
+
+        <p><strong>Combined listed estimate:</strong> {{ enquiry.total|kes }}</p>
+
+        <form class="actions" method="post" action="{{ url_for('enquiry_status', enquiry_id=enquiry.id) }}">
+            {{ csrf() }}
+            <select name="status" aria-label="Enquiry status">
+                {% for status in ['New', 'Contacted', 'Completed'] %}
+                <option value="{{ status }}" {{ 'selected' if enquiry.status==status else '' }}>
+                    {{ status }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Update status</button>
+        </form>
+    </article>
+    {% else %}
+    <div class="panel">
+        <p>No client enquiries yet.</p>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

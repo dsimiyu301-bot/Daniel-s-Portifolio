@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your project shortlist</h1>
+<p class="muted">
+    Select examples you like. This is an enquiry, not a purchase or payment.
+</p>
+
+{% if projects %}
+<div class="checkout-layout">
+    <section class="panel">
+        {% for project in projects %}
+        <div class="cart-item">
+            <div>
+                <h3>
+                    <a href="{{ url_for('project', project_id=project.id) }}">
+                        {{ project.title }}
+                    </a>
+                </h3>
+                <p>{{ project.price|kes }} · {{ project.days }} days estimated</p>
+            </div>
+            <form method="post" action="{{ url_for('remove_from_cart', project_id=project.id) }}">
+                {{ csrf() }}
+                <button class="danger" type="submit">Remove</button>
+            </form>
+        </div>
+        {% endfor %}
+        <h3>Combined listed estimate: {{ total|kes }}</h3>
+        <p class="muted">
+            If these are alternative examples for one website, this total is not
+            your quote. Explain your preferred combination below.
+            Delivery times are per project and are not a combined schedule.
+        </p>
+        <a href="{{ url_for('index') }}">← Continue browsing</a>
+    </section>
+
+    <section class="panel">
+        <h2>Tell Daniel what you need</h2>
+        <form method="post" action="{{ url_for('checkout') }}" class="stack">
+            {{ csrf() }}
+
+            <label>Your name
+                <input name="name" required maxlength="100" autocomplete="name">
+            </label>
+
+            <label>Email address
+                <input name="email" type="email" required maxlength="254" autocomplete="email">
+            </label>
+
+            <label>Phone / WhatsApp
+                <input name="phone" type="tel" required maxlength="30" autocomplete="tel">
+            </label>
+
+            <label>Project requirements
+                <textarea name="message" rows="6" required maxlength="3000"
+                    placeholder="I want a website like this for my business. I need..."></textarea>
+            </label>
+
+            <label class="checkbox">
+                <input type="checkbox" name="consent" value="yes" required>
+                <span>
+                    I agree that Daniel may store these details and contact me
+                    about this enquiry. I will not include passwords or payment details.
+                </span>
+            </label>
+
+            <button type="submit">Submit project enquiry</button>
+            <small class="muted">
+                Your request is saved to Daniel’s dashboard.
+                You can also send the reference through WhatsApp on the next page.
+            </small>
+        </form>
+    </section>
+</div>
+{% else %}
+<section class="panel empty">
+    <h2>Your shortlist is empty</h2>
+    <p>Browse the project examples and select the ones you like.</p>
+    <a class="button" href="{{ url_for('index') }}">Explore projects</a>
+</section>
+{% endif %}
+{% endblock %}

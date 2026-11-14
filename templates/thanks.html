@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel empty">
+    <span class="success-icon">✓</span>
+    <h1>Your enquiry has been saved</h1>
+    <p>Thank you, {{ enquiry.name }}.</p>
+    <p>Your reference is <strong>{{ enquiry.reference }}</strong>.</p>
+    <p>
+        Daniel can now view your request in his dashboard.
+        To start a conversation immediately, open WhatsApp below.
+    </p>
+    <a class="button" href="{{ whatsapp }}" target="_blank" rel="noopener noreferrer">
+        Open WhatsApp with enquiry reference
+    </a>
+    <p class="muted">
+        WhatsApp will open a prepared message. Review it and press Send yourself.
+        No email or WhatsApp message has been sent automatically.
+    </p>
+    <a href="{{ url_for('index') }}">Return to projects</a>
+</section>
+{% endblock %}

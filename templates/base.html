@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+        content="Explore website and software project packages by Daniel Wanjala Simiyu in Kitale, Kenya.">
+    <title>{% block title %}Daniel Dev | Project Marketplace{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    {% macro csrf() -%}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {%- endmacro %}
+
+    <div class="topbar">
+        Built in Kitale · Available for website and software projects
+    </div>
+
+    <header class="header">
+        <div class="container nav">
+            <a class="brand" href="{{ url_for('index') }}">Daniel<span>Dev</span></a>
+
+            <form class="search" method="get" action="{{ url_for('index') }}">
+                <input name="q" placeholder="Search websites, shops, systems..." value="{{ request.args.get('q', '') }}"
+                    aria-label="Search projects">
+                <button type="submit">Search</button>
+            </form>
+
+            <a class="cart-link" href="{{ url_for('cart') }}">
+                Shortlist <strong>{{ cart_count }}</strong>
+            </a>
+
+            {% if session.get('admin') %}
+            <a href="{{ url_for('admin') }}">Dashboard</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+        <div class="notice" role="status">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <h3>{{ owner.name }}</h3>
+                <p>Web developer · {{ owner.location }}</p>
+                <p>Choose a project style. Tell me what you want to build.</p>
+            </div>
+
+            <div>
+                <h3>Contact Daniel</h3>
+                <p><a href="mailto:{{ owner.email }}">{{ owner.email }}</a></p>
+                <p><a href="tel:+{{ owner.whatsapp }}">{{ owner.phone }}</a></p>
+                <a href="https://wa.me/{{ owner.whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            </div>
+
+            <div>
+                <h3>Project information</h3>
+                <p>Prices are starting estimates, not binding quotations.</p>
+                <p>Delivery periods depend on the agreed scope and supplied content.</p>
+                <a href="{{ url_for('login') }}">Administrator login</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

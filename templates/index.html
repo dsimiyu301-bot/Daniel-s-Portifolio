@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div>
+        <span class="eyebrow">YOUR IDEA. YOUR WEBSITE. YOUR NEXT STEP.</span>
+        <h1>Shop for your next<br>digital project.</h1>
+        <p>
+            I’m Daniel Wanjala Simiyu, a web developer based in Kitale.
+            Explore project styles, compare starting prices and timelines,
+            then tell me what you want to build.
+        </p>
+        <a class="button" href="#projects">Explore projects</a>
+        <a class="button outline" href="https://wa.me/{{ owner.whatsapp }}" target="_blank"
+            rel="noopener noreferrer">Talk to Daniel</a>
+    </div>
+    <div class="hero-panel">
+        <span class="code-symbol">&lt;/&gt;</span>
+        <h2>Websites that work for you</h2>
+        <p>Business websites · Online stores · Custom systems</p>
+    </div>
+</section>
+
+<div class="benefits">
+    <div><strong>Clear starting prices</strong><span>Plan your budget</span></div>
+    <div><strong>Visible timelines</strong><span>Understand the estimate</span></div>
+    <div><strong>Direct communication</strong><span>Speak with the developer</span></div>
+</div>
+
+<section class="shop-layout" id="projects">
+    <aside class="panel sidebar">
+        <h3>Categories</h3>
+        <a class="{{ 'active' if not category else '' }}" href="{{ url_for('index') }}">All projects</a>
+        {% for item in categories %}
+        <a class="{{ 'active' if category == item else '' }}" href="{{ url_for('index', category=item, q=q) }}">{{ item
+            }}</a>
+        {% endfor %}
+        <hr>
+        <p class="muted">Need something different? Send me your requirements.</p>
+        <a href="mailto:{{ owner.email }}">Request a custom quote</a>
+    </aside>
+
+    <div>
+        <div class="section-heading">
+            <div>
+                <h2>Featured project packages</h2>
+                <p class="muted">{{ projects|length }} matching projects</p>
+            </div>
+            <form method="get" class="sort-form">
+                <input type="hidden" name="q" value="{{ q }}">
+                <input type="hidden" name="category" value="{{ category }}">
+                <select name="sort" aria-label="Sort projects">
+                    {% for value, label in [
+                    ('newest', 'Newest first'),
+                    ('price-low', 'Lowest price'),
+                    ('price-high', 'Highest price'),
+                    ('fastest', 'Fastest delivery')
+                    ] %}
+                    <option value="{{ value }}" {{ 'selected' if sort==value else '' }}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Apply</button>
+            </form>
+        </div>
+
+        <div class="project-grid">
+            {% for project in projects %}
+            <article class="project-card">
+                <a class="project-art" href="{{ url_for('project', project_id=project.id) }}">
+                    {% if project.image %}
+                    <img src="{{ project.image }}" alt="{{ project.title }}" loading="lazy"
+                        referrerpolicy="no-referrer">
+                    {% else %}
+                    <div class="placeholder">
+                        <span>&lt;/&gt;</span>
+                        <strong>{{ project.category }}</strong>
+                        <small>PROJECT PREVIEW</small>
+                    </div>
+                    {% endif %}
+                </a>
+                <div class="card-body">
+                    <span class="badge">{{ project.category }}</span>
+                    <h3>
+                        <a href="{{ url_for('project', project_id=project.id) }}">
+                            {{ project.title }}
+                        </a>
+                    </h3>
+                    <p class="muted">{{ project.description|truncate(105) }}</p>
+                    <p class="price">{{ project.price|kes }} <small>starting from</small></p>
+                    <p class="delivery">Estimated delivery: {{ project.days }} days</p>
+                    <form method="post" action="{{ url_for('add_to_cart', project_id=project.id) }}">
+                        {{ csrf() }}
+                        <button class="full" type="submit">+ Add to shortlist</button>
+                    </form>
+                    <a class="detail-link" href="{{ url_for('project', project_id=project.id) }}">
+                        View project details
+                    </a>
+                </div>
+            </article>
+            {% else %}
+            <div class="panel">
+                <h3>No projects found</h3>
+                <p>Try a different search or category.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="panel about">
+    <h2>How it works</h2>
+    <div class="steps">
+        <div><strong>1. Browse</strong>
+            <p>Find a project similar to your idea.</p>
+        </div>
+        <div><strong>2. Shortlist</strong>
+            <p>Select examples and share your requirements.</p>
+        </div>
+        <div><strong>3. Discuss</strong>
+            <p>Agree on the scope, final price and delivery schedule.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

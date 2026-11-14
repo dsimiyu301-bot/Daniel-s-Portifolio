@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel login-box">
+    <h1>Administrator login</h1>
+    <p class="muted">Manage your projects and client enquiries.</p>
+    <form method="post" class="stack">
+        {{ csrf() }}
+        <label>Password
+            <input type="password" name="password" required maxlength="1024" autocomplete="current-password">
+        </label>
+        <button type="submit">Sign in</button>
+    </form>
+</section>
+{% endblock %}
